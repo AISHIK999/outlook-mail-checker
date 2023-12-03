@@ -15,6 +15,7 @@ Contents of the readme have been shown below.
 git clone https://github.com/AISHIK999/outlook-mail-checker
 ```
 4. Run the `run.ps1` file using powershell. If you have moved the `run.ps1` file outside of the program folder, then just change the path in the `run.ps1` as commented to the path of the `outlook-mail-checker/send_mail.py` file.
+5. Open the `outlook-mail-checker/send_mail.py` file and change the `RECIPIENT_EMAIL` variable to the email address you want to send the email to.
 ## Usage
 To run the program, just run the `run.ps1` file. Instructions remain same as step 4 of [installation](#installation).
 ## License
