@@ -1,10 +1,11 @@
 import win32com.client
 import pandas as pd
 import os
+import re
 
 
 # Constants
-RE = "re"
+REP = "re: "
 URGENT = "urgent"
 HTML_TABLE_TEMPLATE = """
 <!DOCTYPE html>
@@ -44,8 +45,8 @@ def count_mails(inbox):
     """
     urgent_count = 0
     for message in inbox.Items:
-        if not (RE in message.Subject.lower()):
-            if (URGENT in message.Subject.lower()) or (URGENT in message.Body.lower()):
+        if not message.Subject.lower().startswith(REP):
+            if re.findall(r'\b' + URGENT + r'\b', message.Subject.lower()) or re.findall(r'\b' + URGENT + r'\b', message.Body.lower()):
                 urgent_count += 1
     return urgent_count
 
@@ -58,8 +59,8 @@ def get_sender_count(inbox):
     """
     sender_count = {}
     for message in inbox.Items:
-        if not (RE in message.Subject.lower()):
-            if (URGENT in message.Subject.lower()) or (URGENT in message.Body.lower()):
+        if not message.Subject.lower().startswith(REP):
+            if re.findall(r'\b' + URGENT + r'\b', message.Subject.lower()) or re.findall(r'\b' + URGENT + r'\b', message.Body.lower()):
                 sender = message.Sender.Name
                 if sender in sender_count:
                     sender_count[sender] += 1
@@ -76,8 +77,8 @@ def get_last_email_date(inbox, sender_count):
     """
     last_email_date = {}
     for message in inbox.Items:
-        if not (RE in message.Subject.lower()):
-            if (URGENT in message.Subject.lower()) or (URGENT in message.Body.lower()):
+        if not message.Subject.lower().startswith(REP):
+            if re.findall(r'\b' + URGENT + r'\b', message.Subject.lower()) or re.findall(r'\b' + URGENT + r'\b', message.Body.lower()):
                 sender = message.Sender.Name
                 email_date = message.ReceivedTime.date()
                 if sender in last_email_date:
@@ -96,6 +97,8 @@ def create_html_table(urgent_count, sender_count, last_email_date):
     :param urgent_count: Number of mails in the folder specified that contains the word "urgent" in the subject or body.
     :param sender_count: Number of mails from each sender in the folder specified that contains the word "urgent" in the subject or body.
     :param last_email_date: Last email date from each sender in the folder specified that contains the word "urgent" in the subject or body.
+
+    :return: HTML table that will be sent in the email, containing urgent mail information.
     """
     html_table = (
         HTML_TABLE_TEMPLATE
@@ -130,6 +133,8 @@ def checker():
     """
     checker is the main function of the module.
     It calls all the other functions and returns the HTML table that will be sent in the email alongwith storing the data in a csv file.
+
+    :return: HTML table that will be sent in the email, containing urgent mail information.
     """
     ol = win32com.client.Dispatch("Outlook.Application")
     inbox = ol.GetNamespace("MAPI").GetDefaultFolder(6)
